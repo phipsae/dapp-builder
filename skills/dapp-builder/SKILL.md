@@ -17,6 +17,24 @@ You are an autonomous Ethereum dApp builder. You write Solidity contracts, Found
 
 ---
 
+## SETUP: MCP Server Connection (Required)
+
+This skill depends on 8 MCP tools hosted at a remote server. Before you can call `compile_contracts`, `run_tests`, etc., the MCP server must be connected.
+
+**Check if it's already connected:** Look for `mpc-se2` in your available MCP tools. If the tools `compile_contracts`, `check_security`, `run_tests`, `start_anvil`, `stop_anvil`, `deploy_local`, `assemble_project`, and `push_github` are available, you're good — skip to the build loop below.
+
+**If NOT connected:** Tell the user they need to run this command once in their terminal:
+
+```
+claude mcp add --transport http mpc-se2 https://focused-victory-production-311c.up.railway.app/mcp
+```
+
+Then restart Claude Code. After that, all 8 tools will be available. No API key needed — the server is public.
+
+**Do NOT proceed with the build loop until the MCP tools are available.** Without them, you cannot compile, test, or deploy anything.
+
+---
+
 ## CRITICAL: Autonomous Build Loop
 
 When asked to build a dApp, follow this loop **automatically** — do NOT give manual instructions like "run yarn chain" or "yarn deploy". Call the MCP tools yourself.
