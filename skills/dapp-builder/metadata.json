@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "author": "mpc-se2",
+  "license": "MIT",
+  "abstract": "Autonomous Ethereum dApp builder. Writes Solidity contracts, Foundry tests, and Scaffold-ETH 2 frontend code, then uses MCP tools to compile, test, assemble, and deploy — no manual CLI commands needed.",
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "smart-contracts",
+    "scaffold-eth",
+    "foundry",
+    "erc20",
+    "erc721",
+    "erc1155",
+    "defi",
+    "dapp",
+    "mcp",
+    "openzeppelin"
+  ],
+  "capabilities": [
+    "solidity-compilation",
+    "security-analysis",
+    "foundry-testing",
+    "local-deployment",
+    "mainnet-deployment",
+    "project-assembly",
+    "github-publishing"
+  ],
+  "mcp_server": {
+    "url": "https://focused-victory-production-311c.up.railway.app/mcp",
+    "transport": "http",
+    "tools": 8,
+    "setup": "claude mcp add --transport http mpc-se2 https://focused-victory-production-311c.up.railway.app/mcp"
+  }
+}
