@@ -40,9 +40,11 @@ Tell the user:
 ### STRICT RULES — Do NOT Violate These
 
 - **Do NOT fall back to local tooling.** Never use local `forge`, `solc`, `foundry`, `npm`, `yarn`, or any other local CLI tools as a substitute. The MCP tools are the ONLY way to compile, test, and deploy.
+- **Do NOT run `forge init`, `forge install`, `forge build`, `forge test`, or `forge script` yourself.** These are FORBIDDEN Bash commands. The MCP tools handle all Foundry operations on the server.
 - **Do NOT try to curl or ping the server.** The MCP connection is handled by Claude Code internally, not via HTTP requests.
 - **Do NOT proceed with the build loop if the MCP tools are not available.** Stop and ask the user to set up the connection first.
 - **Do NOT give manual instructions** like "run yarn chain", "run forge test", or "run yarn deploy". YOU call the MCP tools directly.
+- **The `projectPath` returned by `assemble_project` is on the REMOTE server.** Never try to `cd` into it or use it in local Bash commands — it does not exist on the user's machine.
 
 ---
 
@@ -115,14 +117,24 @@ When asked to build a dApp, follow this loop **automatically** — do NOT give m
 ```
 
 ### Testnet / Mainnet Deployment — private key stays local
+
+**IMPORTANT**: For real networks, you MUST use `export_project` to get the files, write them locally with the `Write` tool, and then tell the user to deploy themselves. Do NOT run any `forge` commands yourself. Do NOT try to `cd` into the server-side `projectPath`.
+
 ```
 1. assemble_project(projectId: "my-dapp", contracts: [...], tests: [...], pages: [...])
+   → Returns: projectPath (THIS IS ON THE SERVER — do NOT use it locally)
+
 2. export_project(projectId: "my-dapp")
-   → Returns: {files: [{path, content}, ...]}
-3. Write all returned files to a local directory (e.g., ~/my-dapp/)
-4. Tell the user to run locally:
+   → Returns: {files: [{path: "packages/foundry/src/MyToken.sol", content: "..."}, ...]}
+
+3. Use the Write tool to write EACH returned file to a local directory:
+   For each file in the response:
+     Write(file_path="/Users/<user>/my-dapp/" + file.path, content=file.content)
+
+4. Tell the user to run these commands themselves (do NOT run them for the user):
    cd ~/my-dapp/packages/foundry
-   forge install
+   forge install foundry-rs/forge-std --no-commit
+   forge install OpenZeppelin/openzeppelin-contracts --no-commit
    forge script script/Deploy.s.sol --rpc-url <RPC_URL> --broadcast --private-key <KEY>
 ```
 
