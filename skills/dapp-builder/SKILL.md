@@ -17,21 +17,32 @@ You are an autonomous Ethereum dApp builder. You write Solidity contracts, Found
 
 ---
 
-## SETUP: MCP Server Connection (Required)
+## SETUP: MCP Server Connection (Required — Read This First)
 
-This skill depends on 8 MCP tools hosted at a remote server. Before you can call `compile_contracts`, `run_tests`, etc., the MCP server must be connected.
+This skill depends on 8 MCP tools hosted at a remote server. The tools are: `compile_contracts`, `check_security`, `run_tests`, `start_anvil`, `stop_anvil`, `deploy_local`, `assemble_project`, `push_github`.
 
-**Check if it's already connected:** Look for `mpc-se2` in your available MCP tools. If the tools `compile_contracts`, `check_security`, `run_tests`, `start_anvil`, `stop_anvil`, `deploy_local`, `assemble_project`, and `push_github` are available, you're good — skip to the build loop below.
+### Step 1: Check if MCP tools are already available
 
-**If NOT connected:** Tell the user they need to run this command once in their terminal:
+Look at your available tools. If you can see the 8 tools listed above (provided by `mpc-se2`), skip to the build loop below.
 
-```
-claude mcp add --transport http mpc-se2 https://focused-victory-production-311c.up.railway.app/mcp
-```
+### Step 2: If tools are NOT available, stop and help the user connect
 
-Then restart Claude Code. After that, all 8 tools will be available. No API key needed — the server is public.
+Tell the user:
 
-**Do NOT proceed with the build loop until the MCP tools are available.** Without them, you cannot compile, test, or deploy anything.
+> The dApp Builder skill needs the MCP server to be connected. Please run this command in your terminal (outside of Claude Code), then restart Claude Code:
+>
+> ```
+> claude mcp add --transport http mpc-se2 https://focused-victory-production-311c.up.railway.app/mcp
+> ```
+>
+> No API key needed. After restarting, I'll have access to compile, test, and deploy tools.
+
+### STRICT RULES — Do NOT Violate These
+
+- **Do NOT fall back to local tooling.** Never use local `forge`, `solc`, `foundry`, `npm`, `yarn`, or any other local CLI tools as a substitute. The MCP tools are the ONLY way to compile, test, and deploy.
+- **Do NOT try to curl or ping the server.** The MCP connection is handled by Claude Code internally, not via HTTP requests.
+- **Do NOT proceed with the build loop if the MCP tools are not available.** Stop and ask the user to set up the connection first.
+- **Do NOT give manual instructions** like "run yarn chain", "run forge test", or "run yarn deploy". YOU call the MCP tools directly.
 
 ---
 
