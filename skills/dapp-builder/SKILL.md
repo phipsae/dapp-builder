@@ -19,11 +19,11 @@ You are an autonomous Ethereum dApp builder. You write Solidity contracts, Found
 
 ## SETUP: MCP Server Connection (Required — Read This First)
 
-This skill depends on 8 MCP tools hosted at a remote server. The tools are: `compile_contracts`, `check_security`, `run_tests`, `start_anvil`, `stop_anvil`, `deploy_local`, `assemble_project`, `push_github`.
+This skill depends on 9 MCP tools hosted at a remote server. The tools are: `compile_contracts`, `check_security`, `run_tests`, `start_anvil`, `stop_anvil`, `deploy_local`, `assemble_project`, `export_project`, `push_github`.
 
 ### Step 1: Check if MCP tools are already available
 
-Look at your available tools. If you can see the 8 tools listed above (provided by `mpc-se2`), skip to the build loop below.
+Look at your available tools. If you can see the 9 tools listed above (provided by `mpc-se2`), skip to the build loop below.
 
 ### Step 2: If tools are NOT available, stop and help the user connect
 
@@ -66,7 +66,7 @@ When asked to build a dApp, follow this loop **automatically** — do NOT give m
 
 ---
 
-## MCP Tools Reference (8 tools from `mpc-se2` server)
+## MCP Tools Reference (9 tools from `mpc-se2` server)
 
 ### Compilation & Analysis
 
@@ -99,13 +99,14 @@ When asked to build a dApp, follow this loop **automatically** — do NOT give m
 | Tool | Purpose | Key Inputs |
 |------|---------|------------|
 | `assemble_project` | Copy SE2 template, inject contracts/tests/pages into correct directories. Returns `projectPath`. | `projectId`, `contracts: [{name, content}]`, optional `pages`, `tests` |
+| `export_project` | Export all assembled project files as `[{path, content}]` so you can write them to the user's local machine. Use for testnet/mainnet deploys to keep private keys local. | `projectId` (must call `assemble_project` first) |
 | `push_github` | Create GitHub repo and push all project files. | `projectId`, `githubToken`, optional `repoName`, `description` |
 
 ---
 
 ## Deployment Guide
 
-### Local Testing (Anvil)
+### Local Testing (Anvil) — uses test keys, safe to deploy remotely
 ```
 1. start_anvil(projectId: "my-dapp")
    → Returns: rpcUrl (http://127.0.0.1:PORT), accounts with private keys
@@ -113,11 +114,21 @@ When asked to build a dApp, follow this loop **automatically** — do NOT give m
 3. deploy_local(projectId: "my-dapp", rpcUrl: <from step 1>, privateKey: <from step 1>)
 ```
 
-### Testnet / Mainnet Deployment
+### Testnet / Mainnet Deployment — private key stays local
 ```
 1. assemble_project(projectId: "my-dapp", contracts: [...], tests: [...], pages: [...])
-2. deploy_local(projectId: "my-dapp", rpcUrl: "<network RPC>", privateKey: "<user's key>")
+2. export_project(projectId: "my-dapp")
+   → Returns: {files: [{path, content}, ...]}
+3. Write all returned files to a local directory (e.g., ~/my-dapp/)
+4. Tell the user to run locally:
+   cd ~/my-dapp/packages/foundry
+   forge install
+   forge script script/Deploy.s.sol --rpc-url <RPC_URL> --broadcast --private-key <KEY>
 ```
+
+**Why**: The user's private key never leaves their machine. The MCP server only compiles, tests, and assembles — deployment with real keys happens locally.
+
+**Requirements**: The user needs `forge` (Foundry) installed locally for mainnet/testnet deploys.
 
 Common RPC URLs:
 - **Sepolia**: `https://rpc.sepolia.org` or user's Alchemy/Infura URL
@@ -125,7 +136,7 @@ Common RPC URLs:
 - **Base Mainnet**: `https://mainnet.base.org`
 - **Ethereum Mainnet**: User provides their own RPC URL
 
-Always ask the user for their private key and RPC URL before deploying to a real network. Never hardcode or store private keys.
+Always ask the user for their RPC URL before deploying to a real network. Never send private keys to the MCP server for real network deployments.
 
 ---
 
